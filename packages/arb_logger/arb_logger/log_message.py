@@ -7,29 +7,25 @@ from typing import Any, Dict, Optional, Tuple
 class LogMessage:
     name: str
     msg: str
-    args: Optional[Tuple[Any, ...]]
-    levelname: str
-    levelno: int
-    pathname: str
-    filename: str
-    module: str
-    exc_info: Optional[Tuple[type, BaseException, TracebackType]]
-    exc_text: Optional[str]
-    stack_info: Optional[str]
-    lineno: int
-    funcName: Optional[str]
-    created: float
-    msecs: float
-    relativeCreated: float
-    thread: int
-    threadName: str
-    processName: str
-    process: int
+    levelno: Optional[int | str] = 'INFO'
+    args: Optional[Tuple[Any, ...]] = None
+    levelname: Optional[str] = None
+    pathname: Optional[str] = None
+    filename: Optional[str] = None
+    module: Optional[str] = None
+    exc_info: Optional[Tuple[type, BaseException, TracebackType]] = None
+    exc_text: Optional[str] = None
+    stack_info: Optional[str] = None
+    lineno: Optional[int] = None
+    funcName: Optional[str] = None
+    created: Optional[float] = None
+    msecs: Optional[float] = None
+    relativeCreated: Optional[float] = None
+    thread: Optional[int] = None
+    threadName: Optional[str] = None
+    processName: Optional[str] = None
+    process: Optional[int] = None
 
     @classmethod
     def from_dict(cls, record_dict: Dict[str, Any]) -> 'LogMessage':
-        return cls(args=record_dict.get('args', ()),
-                   exc_info=record_dict.get('exc_info', None),
-                   exc_text=record_dict.get('exc_text', None),
-                   stack_info=record_dict.get('stack_info', None),
-                   **record_dict)
+        return cls(**record_dict)
