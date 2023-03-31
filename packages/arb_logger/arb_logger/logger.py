@@ -17,12 +17,16 @@ def get_redis_log_client() -> Redis:
     return Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
 
+def get_redis_log_key(name: str):
+    return f'logs:{name}'
+
+
 class RedisHandler(logging.Handler):
 
-    def __init__(self, redis_client, stream_key):
+    def __init__(self, redis_client, redis_key):
         super().__init__()
         self.redis_client: Redis = redis_client
-        self.stream_key = stream_key
+        self.redis_key = redis_key
 
     def emit(self, record):
         try:
@@ -31,8 +35,9 @@ class RedisHandler(logging.Handler):
                 for k, v in record.__dict__.items()
                 if k != 'args' and not k.startswith('_') and v is not None
             }
-            self.redis_client.xadd(self.stream_key, record_dict)
-            self.redis_client.publish(self.stream_key,
+            #! split : to get the stream name being 'logs' for grafana
+            self.redis_client.xadd(self.redis_key.split(':')[0], record_dict)
+            self.redis_client.publish(self.redis_key,
                                       json.dumps(record_dict))  # Add this line
         except Exception:
             self.handleError(record)
@@ -98,8 +103,8 @@ def get_logger(name: str = None,
 
         # Set up RedisHandler
         redis_client = get_redis_log_client()
-        stream_key = f'logs:{name}'
-        redis_handler = RedisHandler(redis_client, stream_key)
+        redis_key = get_redis_log_key(name)
+        redis_handler = RedisHandler(redis_client, redis_key)
         redis_handler.setLevel(logging.WARNING)
         redis_handler.setFormatter(formatter)
         logger.addHandler(redis_handler)

@@ -5,7 +5,7 @@ setup(
     author='arb',
     author_email='arb.trops@gmail.com',
     description='arb_logger de ouf',
-    version='1.0.0',
+    version='1.1.0',
     packages=find_packages(),
     install_requires=['coloredlogs', 'redis'],
     entry_points={

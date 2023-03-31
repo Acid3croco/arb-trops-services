@@ -3,7 +3,7 @@ import logging
 import platform
 
 from arb_logger.log_message import LogMessage
-from arb_logger.logger import get_logger, get_redis_log_client
+from arb_logger.logger import get_logger, get_redis_log_client, get_redis_log_key
 
 if platform.system() == 'Darwin':
     import pync
@@ -18,7 +18,7 @@ class RedisLogSubscriber:
 
     def listen(self):
         self.pubsub = self.redis_client.pubsub(ignore_subscribe_messages=True)
-        pattern = 'logs:*'
+        pattern = get_redis_log_key('*')
         self.pubsub.psubscribe(pattern)
 
         for message in self.pubsub.listen():
