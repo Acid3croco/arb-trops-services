@@ -3,9 +3,12 @@ import sys
 import json
 import inspect
 import logging
+import logging.handlers
 import traceback
 
 from pathlib import Path
+from dataclasses import fields
+from arb_logger.alert_message import AlertMessage
 
 import coloredlogs
 
@@ -28,17 +31,17 @@ class RedisHandler(logging.Handler):
         self.redis_client: Redis = redis_client
         self.redis_key = redis_key
 
-    def emit(self, record):
+        self.alert_fields = {f.name for f in fields(AlertMessage)}
+
+    def emit(self, record: logging.LogRecord):
         try:
-            record_dict = {
-                k: v
-                for k, v in record.__dict__.items()
-                if k != 'args' and not k.startswith('_') and v is not None
-            }
+            record_dict = AlertMessage.log_record_to_dict(record)
             #! split : to get the stream name being 'logs' for grafana
             self.redis_client.xadd(self.redis_key.split(':')[0], record_dict)
             self.redis_client.publish(self.redis_key,
-                                      json.dumps(record_dict))  # Add this line
+                                      json.dumps(record_dict,
+                                                 separators=(',', ':'),
+                                                 default=str))  # Add this line
         except Exception:
             self.handleError(record)
 
@@ -87,7 +90,10 @@ def get_logger(name: str = None,
                level: int = logging.DEBUG,
                path: Path = None,
                log_in_file: bool = True,
-               short: bool = False):
+               short: bool = False,
+               redis_handler: bool = True,
+               custom_redis_client: Redis = None):
+
     logger = logging.getLogger(name or get_logger_name())
 
     if not logger.hasHandlers():
@@ -102,12 +108,13 @@ def get_logger(name: str = None,
         coloredlogs.install(level=level, logger=logger, fmt=fmt)
 
         # Set up RedisHandler
-        redis_client = get_redis_log_client()
-        redis_key = get_redis_log_key(name)
-        redis_handler = RedisHandler(redis_client, redis_key)
-        redis_handler.setLevel(logging.WARNING)
-        redis_handler.setFormatter(formatter)
-        logger.addHandler(redis_handler)
+        if redis_handler:
+            redis_client = custom_redis_client or get_redis_log_client()
+            redis_key = get_redis_log_key(name)
+            redis_handler = RedisHandler(redis_client, redis_key)
+            redis_handler.setLevel(logging.WARNING)
+            redis_handler.setFormatter(formatter)
+            logger.addHandler(redis_handler)
 
         # Set up FileHandler
         if log_in_file:
@@ -119,7 +126,13 @@ def get_logger(name: str = None,
             else:
                 pid = os.getpid()
                 filename = f'{name}.{pid}.log'
-            file_handler = logging.FileHandler(log_dir / filename)
+
+            file_handler = logging.handlers.TimedRotatingFileHandler(
+                log_dir / filename,
+                when='midnight',
+                interval=1,
+                backupCount=7,
+                utc=True)
             file_handler.setFormatter(formatter)
             logger.addHandler(file_handler)
 

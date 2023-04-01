@@ -6,7 +6,7 @@ setup(
     author_email='arb.trops@gmail.com',
     description="A custom logger with Redis integration",
     url="https://github.com/Acid3croco/arb-trops-services",
-    version='1.1.1',
+    version='2.0.0',
     packages=find_packages(),
     install_requires=['coloredlogs', 'redis', 'pync'],
     entry_points={
