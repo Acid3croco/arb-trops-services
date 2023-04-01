@@ -1,4 +1,8 @@
+from pathlib import Path
 from setuptools import setup, find_packages
+
+this_directory = Path(__file__).parent
+long_description = (this_directory / "README.md").read_text()
 
 setup(
     name='arb_logger',
@@ -6,7 +10,9 @@ setup(
     author_email='arb.trops@gmail.com',
     description="A custom logger with Redis integration",
     url="https://github.com/Acid3croco/arb-trops-services",
-    version='2.0.0',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
+    version='2.0.1',
     packages=find_packages(),
     install_requires=['coloredlogs', 'redis', 'pync'],
     entry_points={

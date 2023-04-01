@@ -39,7 +39,11 @@ Here's an example of how to create a logger with default settings:
 ```python
 from arb_logger import get_logger
 
-logger = get_logger()
+# The name of the logger will be the name of the calling module
+# if you call the logger from the main module (i.e. __name__ == "__main__")
+# you have to specify the name of the logger, if you call it from a module
+# the name of the logger will be the name of the module automatically
+logger = get_logger('basic_logger')
 
 logger.debug("Debug message")
 logger.info("Info message")
@@ -79,7 +83,8 @@ def get_logger(name: str = None,
                path: Path = None,
                log_in_file: bool = True,
                short: bool = False,
-               redis_handler: bool = True)
+               redis_handler: bool = True,
+               custom_redis_client: Redis = None) -> logging.Logger:
 ```
 
 #### Parameters
@@ -90,15 +95,8 @@ def get_logger(name: str = None,
 - `log_in_file`: Whether to log messages to a file. Defaults to True.
 - `short`: Whether to use a short log filename without the process ID. Defaults to False.
 - `redis_handler`: Whether to use a Redis handler for logging. Defaults to True.
+- `custom_redis_client`: A custom Redis client to use for logging. Defaults to None, which means a new Redis client will be created using the `get_redis_log_client()` method inside `logger.py`.
 
 #### Returns
 
 A logger with the specified settings.
-
-## Contributing
-
-Feel free to open issues, submit pull requests, or reach out to the maintainers if you have any questions or suggestions for improvements.
-
-## License
-
-The arb_logger package is licensed under the [MIT License](https://opensource.org/licenses/MIT)
