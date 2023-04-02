@@ -1,4 +1,4 @@
-# README.md for arb_logger
+# arb_logger
 
 ## Introduction
 

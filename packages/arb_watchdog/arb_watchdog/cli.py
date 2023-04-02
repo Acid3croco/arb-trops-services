@@ -76,7 +76,8 @@ class ProcessWatchdogCLI:
 
 
 def main():
-    default_path = os.getenv('ARB_CONFIGS_PATH') + '/arb_watchdog_config.json'
+    default_path = (os.getenv('ARB_CONFIGS_PATH', '.') +
+                    '/arb_watchdog_config.json')
 
     parser = ArgumentParser(description='Process Watchdog CLI')
     parser.add_argument('-f',

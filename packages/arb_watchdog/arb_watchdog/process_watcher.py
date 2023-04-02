@@ -107,7 +107,8 @@ class ProcessWatcher:
 
 
 def main():
-    default_path = os.getenv('ARB_CONFIGS_PATH') + '/arb_watchdog_config.json'
+    default_path = (os.getenv('ARB_CONFIGS_PATH', '.') +
+                    '/arb_watchdog_config.json')
 
     parser = ArgumentParser(description='Process Watcher')
     parser.add_argument('-f',
