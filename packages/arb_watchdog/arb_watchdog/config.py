@@ -1,9 +1,8 @@
 import json
-from threading import Thread
 import time
 
-from typing import Dict
 from pathlib import Path
+from threading import Thread
 
 from watchdog.observers import Observer
 from arb_logger.logger import get_logger
@@ -24,11 +23,23 @@ class ConfigFileHandler(FileSystemEventHandler):
 
 
 class Config:
+    __instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls.__instance is None:
+            cls.__instance = super().__new__(cls)
+            cls.__instance.__initialized = False
+        return cls.__instance
 
     def __init__(self, config_file: Path):
+        if self.__initialized:
+            return
+        self.__initialized = True
         self.config_file = config_file
         self.config_data = {}
         self.load_config()
+
+        Thread(target=self.watch_config, daemon=True).start()
 
     def load_config(self):
         LOGGER.info(f'Loading config from {self.config_file}')
@@ -38,22 +49,27 @@ class Config:
 
     def watch_config(self):
         LOGGER.info('Watching config file for changes')
-        observer = Observer()
+        self._observer = Observer()
         event_handler = ConfigFileHandler(self.load_config)
-        observer.schedule(event_handler,
-                          str(self.config_file.parent),
-                          recursive=False)
-        observer.start()
+        self._observer.schedule(event_handler,
+                                str(self.config_file.parent),
+                                recursive=False)
+        self._observer.start()
 
         try:
             while True:
                 time.sleep(1)
         except KeyboardInterrupt:
-            observer.stop()
-        observer.join()
+            self._observer.stop()
+
+        self._observer.join()
+
+    def stop(self):
+        if hasattr(self, '_observer') and self._observer.is_alive():
+            self._observer.stop()
+            self._observer.join()
 
 
 def get_config(config_file: Path) -> Config:
     config = Config(config_file)
-    Thread(target=config.watch_config, daemon=True).start()
     return config
