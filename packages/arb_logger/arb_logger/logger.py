@@ -121,17 +121,21 @@ def get_logger(name: str = None,
             log_dir = path or Path(os.environ.get('ARB_LOGS_PATH', 'logs'))
             log_dir.mkdir(parents=True, exist_ok=True)
 
+            # Get the rootname of the calling module/logger name
+            # use it as the log filename to regroup multiple sublogger
+            # under the same file
+            _filename = name.split('.')[0]
             if short:
-                filename = f'{name}.log'
+                filename = f'{_filename}.log'
             else:
                 pid = os.getpid()
-                filename = f'{name}.{pid}.log'
+                filename = f'{_filename}.{pid}.log'
 
             file_handler = logging.handlers.TimedRotatingFileHandler(
                 log_dir / filename,
                 when='midnight',
                 interval=1,
-                backupCount=7,
+                backupCount=3,
                 utc=True)
             file_handler.setFormatter(formatter)
             logger.addHandler(file_handler)

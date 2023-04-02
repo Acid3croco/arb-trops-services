@@ -13,6 +13,7 @@
 - Uncaught exceptions logging
 - Customizable log format
 - Unit tests for key functionality
+- `arb_alerts` program to listen to Redis streams and send alerts on MacOS
 
 ## Installation
 
@@ -100,3 +101,19 @@ def get_logger(name: str = None,
 #### Returns
 
 A logger with the specified settings.
+
+---
+
+## arb_alerts
+
+`arb_alerts` is a script that listens for log messages from a Redis channel and processes them. It logs the messages to a local logger and sends macOS notifications for messages with log level ERROR or higher.
+
+### Features
+
+```bash
+arb_alerts
+```
+
+- Listens for log messages on a Redis channel.
+- Logs the messages to a local logger.
+- Sends macOS notifications for messages with log level ERROR or higher.

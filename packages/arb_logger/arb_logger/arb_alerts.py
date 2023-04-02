@@ -8,10 +8,10 @@ from arb_logger.logger import get_logger, get_redis_log_client, get_redis_log_ke
 if platform.system() == 'Darwin':
     import pync
 
-LOGGER = get_logger('RedisLogSubscriber', short=True, redis_handler=False)
+LOGGER = get_logger('arb_alerts', short=True, redis_handler=False)
 
 
-class RedisLogSubscriber:
+class ArbAlerts:
 
     def __init__(self):
         self.redis_client = get_redis_log_client()
@@ -23,8 +23,8 @@ class RedisLogSubscriber:
 
         for message in self.pubsub.listen():
             if message['type'] == 'pmessage':
-                if message['channel'] == 'logs:RedisLogSubscriber':
-                    # Prevent recursive logging of RedisLogSubscriber's messages
+                if message['channel'] == 'logs:arb_alerts':
+                    # Prevent recursive logging of arb_alerts's messages
                     continue
                 try:
                     record_dict = json.loads(message['data'])
@@ -64,11 +64,10 @@ class RedisLogSubscriber:
 
 
 def main():
-    LOGGER.info('Starting RedisLogSubscriber')
-    log_subscriber = RedisLogSubscriber()
+    LOGGER.info('Starting arb_alerts')
+    arb_alerts = ArbAlerts()
     LOGGER.info('Listening for log messages...')
-    print('')
-    log_subscriber.listen()
+    arb_alerts.listen()
 
 
 if __name__ == '__main__':
