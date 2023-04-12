@@ -66,7 +66,7 @@ class LoggerStdout:
 
     def write(self, message):
         if message.rstrip() != '':
-            self.logger.stdout(message.rstrip())
+            self.logger.stdout('\n' + message.rstrip())
 
     def flush(self):
         self.stdout.flush()
@@ -142,6 +142,9 @@ def get_logger(name: str = None,
 
         # Log uncaught exceptions using sys.excepthook
         def log_uncaught_exceptions(exc_type, exc_value, exc_traceback):
+            if exc_type is KeyboardInterrupt:
+                sys.__excepthook__(exc_type, exc_value, exc_traceback)
+                return
             logger.critical(''.join(
                 traceback.format_exception(exc_type, exc_value,
                                            exc_traceback)))

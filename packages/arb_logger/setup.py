@@ -8,7 +8,7 @@ setup(
     url="https://github.com/Acid3croco/arb-trops-services",
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
-    version='2.1.1',
+    version='2.1.2',
     packages=find_packages(),
     install_requires=['coloredlogs', 'redis', 'pync'],
     entry_points={
