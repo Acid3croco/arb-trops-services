@@ -1,6 +1,8 @@
 packages/arb_logger/arb_logger/test.py
 .vscode/launch.json
 arb_watchdog_config.json
+test_arb_launcher.py
+dummy_prog.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

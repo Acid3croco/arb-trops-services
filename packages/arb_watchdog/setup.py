@@ -11,7 +11,9 @@ setup(
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     url='https://github.com/Acid3croco/arb-trops-services',
-    install_requires=['watchdog', 'redis', 'tabulate', 'colorama', 'psutil'],
+    install_requires=[
+        'watchdog', 'redis', 'tabulate', 'colorama', 'psutil', 'arb_logger'
+    ],
     entry_points={
         'console_scripts': [
             'arb_watchdog = arb_watchdog.process_watcher:main',

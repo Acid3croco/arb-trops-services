@@ -105,7 +105,10 @@ def get_logger(name: str = None,
         formatter = logging.Formatter(fmt)
 
         # Set up coloredlogs with the custom formatter
-        coloredlogs.install(level=level, logger=logger, fmt=fmt)
+        coloredlogs.install(level=level,
+                            logger=logger,
+                            fmt=fmt,
+                            milliseconds=True)
 
         # Set up RedisHandler
         if redis_handler:
