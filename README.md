@@ -8,6 +8,10 @@
 
 `arb_watchdog` is a Python package designed to monitor and manage the status of specified processes. It uses Redis as a backend for storing process data and provides a simple API for interacting with this data. The package is highly configurable and can be used to monitor and manage a wide range of processes.
 
+## arb_launcher [README.md](packages/arb_launcher/README.md)
+
+`arb_launcher` is a Python package that provides a simple yet powerful way to launch and manage detached programs and methods. It allows you to run external programs or Python methods in a completely detached process, making them independent of the parent process.
+
 ## Contributing
 
 Feel free to open issues, submit pull requests, or reach out to the maintainers if you have any questions or suggestions for improvements.
