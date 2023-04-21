@@ -8,7 +8,7 @@ setup(
     url="https://github.com/Acid3croco/arb-trops-services",
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
-    version='1.0.0',
+    version='1.1.0',
     packages=find_packages(),
     install_requires=['setproctitle', 'arb_logger', 'psutil'],
     entry_points={

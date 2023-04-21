@@ -44,7 +44,9 @@ class ProgramHandler:
                     if callable(self.target):
                         proc_name = self._get_process_name()
                         setproctitle(proc_name)
-                        LOGGER.info(f'Running method as process: {proc_name}')
+                        LOGGER.info(
+                            f'Running method as process: {proc_name}, pid: {os.getpid()}'
+                        )
                         with redirect_stdout(stdout), redirect_stderr(stderr):
                             self.target(*args)
                     else:
@@ -56,7 +58,10 @@ class ProgramHandler:
                             f"Running command as process: {' '.join(cmd)}")
                         #? detach the grandchild process, prevent ps showing .../arb_launcher <target>
                         #? prevered over subprocess.call, idk the consequences, maybe we spawn a lot of processes doing so
-                        subprocess.Popen(cmd, stdout=stdout, stderr=stderr)
+                        prc = subprocess.Popen(cmd,
+                                               stdout=stdout,
+                                               stderr=stderr)
+                        LOGGER.info(f'Process {prc.pid} detached')
                         # subprocess.call(cmd, stdout=stdout, stderr=stderr)
                 LOGGER.debug(
                     f'Process grandchlid {os.getpid()} finished, exiting')
@@ -87,8 +92,20 @@ class ProgramHandler:
             return f'{process_name} {filename} {method}({_args})'.strip()
 
     def terminate_matching_processes(self):
-        cmd = f'pkill -f "{self._get_process_name()}"'
-        LOGGER.info(f'Running command {cmd}')
-        res = os.system(cmd)
-        if res != 0 and res != 256:
-            LOGGER.error(f'Command {cmd} failed with code {res}')
+        target_name = self._get_process_name()
+        current_process = psutil.Process(os.getpid())
+
+        LOGGER.info(f'Terminating processes with name: {target_name}')
+
+        for process in psutil.process_iter(attrs=['cmdline', 'pid']):
+            try:
+                cmdline = ' '.join(process.info['cmdline'])
+                if target_name in cmdline and process.pid != current_process.pid:
+                    LOGGER.info(
+                        f'Terminating process {process.pid} with cmdline: {cmdline}'
+                    )
+                    process.terminate()
+            except (psutil.NoSuchProcess, psutil.AccessDenied,
+                    psutil.ZombieProcess) as e:
+                LOGGER.warning(
+                    f'Error while accessing process information: {e}')
