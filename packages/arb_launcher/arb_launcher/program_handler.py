@@ -98,6 +98,8 @@ class ProgramHandler:
         LOGGER.info(f'Terminating processes with name: {target_name}')
 
         for process in psutil.process_iter(attrs=['cmdline', 'pid']):
+            if not process.info.get('cmdline'):
+                continue
             try:
                 cmdline = ' '.join(process.info['cmdline'])
                 if target_name in cmdline and process.pid != current_process.pid:
