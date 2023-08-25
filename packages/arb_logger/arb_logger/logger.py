@@ -78,7 +78,7 @@ class LoggerStdout:
 def get_logger_name():
     # Get the name of the calling module
     name = inspect.getmodule(inspect.currentframe().f_back).__name__
-    if name in ('__main__', '__init__'):
+    if name in ('__main__', '__init__', None):
         raise ValueError(
             'Please provide an explicit name for the logger when called from __main__ or __init__.'
         )
@@ -86,7 +86,7 @@ def get_logger_name():
     return name
 
 
-def get_logger(name: str = None,
+def get_logger(name,
                level: int = logging.DEBUG,
                path: Path = None,
                log_in_file: bool = True,
@@ -94,7 +94,8 @@ def get_logger(name: str = None,
                redis_handler: bool = True,
                custom_redis_client: Redis = None):
 
-    logger = logging.getLogger(name or get_logger_name())
+    name = name or get_logger_name()
+    logger = logging.getLogger(name)
 
     if not logger.hasHandlers():
         logger.setLevel(level)
