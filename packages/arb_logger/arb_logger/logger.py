@@ -153,7 +153,9 @@ def get_logger(name,
                 traceback.format_exception(exc_type, exc_value,
                                            exc_traceback)))
 
-        sys.stdout = LoggerStdout(logger)
+        #? DISABLED FOR NOW
+        # Redirect stdout to logger
+        # sys.stdout = LoggerStdout(logger)
         sys.excepthook = log_uncaught_exceptions
 
     return logger
