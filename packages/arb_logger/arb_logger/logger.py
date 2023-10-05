@@ -116,7 +116,7 @@ def get_logger(name,
             redis_client = custom_redis_client or get_redis_log_client()
             redis_key = get_redis_log_key(name)
             redis_handler = RedisHandler(redis_client, redis_key)
-            redis_handler.setLevel(logging.WARNING)
+            redis_handler.setLevel(logging.ERROR)
             redis_handler.setFormatter(formatter)
             logger.addHandler(redis_handler)
 
