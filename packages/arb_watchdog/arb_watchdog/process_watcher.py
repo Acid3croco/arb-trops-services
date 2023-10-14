@@ -13,7 +13,7 @@ from arb_logger.logger import get_logger
 from arb_watchdog.config import get_config
 from arb_watchdog.process_data import ProcessData
 
-LOGGER = get_logger(name='arb_watchdog.watcher')
+LOGGER = get_logger(name='arb_watchdog.watcher', redis_handler=False)
 
 
 def factory(data):

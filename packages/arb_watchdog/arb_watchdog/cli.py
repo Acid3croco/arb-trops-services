@@ -33,6 +33,8 @@ class ProcessWatchdogCLI:
     def get_process_info(self, process_name):
         key = f'arb_watchdog:{process_name}'
         data = self.redis.hgetall(key)
+        if not data:
+            return
         return ProcessData(**data)
 
     def _get_process_last_status_change(self, process_data: ProcessData):
@@ -52,7 +54,6 @@ class ProcessWatchdogCLI:
             process_data = self.get_process_info(process_name)
 
             if process_data:
-
                 status_colored = process_data.status
 
                 if process_data.status == 'UP':
