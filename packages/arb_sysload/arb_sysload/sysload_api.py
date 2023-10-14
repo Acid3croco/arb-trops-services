@@ -9,7 +9,7 @@ CORS(app)
 redis_client = get_sysload_redis()
 
 
-@app.route('/sysload/checks', methods=['GET'])
+@app.route('/api/sysload/checks', methods=['GET'])
 def get_checks():
     # Retrieve all checks from Redis
     checks = {}
@@ -18,7 +18,7 @@ def get_checks():
     return jsonify(checks)
 
 
-@app.route('/sysload/check/<check_name>/action', methods=['POST'])
+@app.route('/api/sysload/check/<check_name>/action', methods=['POST'])
 def check_action(check_name):
     action = request.json.get("action")
     if action == "mute":
