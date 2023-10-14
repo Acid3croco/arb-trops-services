@@ -6,16 +6,16 @@ app = Flask(__name__)
 redis_client = get_sysload_redis()
 
 
-@app.route('/checks', methods=['GET'])
+@app.route('/sysload/checks', methods=['GET'])
 def get_checks():
     # Retrieve all checks from Redis
     checks = {}
-    for key in redis_client.keys():
+    for key in redis_client.keys('arb_sysload:*'):
         checks[key] = redis_client.hgetall(key)
     return jsonify(checks)
 
 
-@app.route('/check/<check_name>/action', methods=['POST'])
+@app.route('/sysload/check/<check_name>/action', methods=['POST'])
 def check_action(check_name):
     action = request.json.get("action")
     if action == "mute":
@@ -33,5 +33,9 @@ def check_action(check_name):
                     f"Action {action} performed on {check_name}"}), 200
 
 
+def main():
+    app.run(debug=True, port=5003)
+
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    main()
