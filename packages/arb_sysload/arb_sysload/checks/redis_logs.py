@@ -11,3 +11,5 @@ class RedisLogsCheck(BaseCheck):
         if length > 1000:  # Example threshold
             message = f"Redis logs stream length is {length}, which is above the threshold."
             self.error(message)
+        else:
+            self.success(f"Redis logs stream length is {length}")

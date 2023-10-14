@@ -13,6 +13,6 @@ class DiskUsageCheck(BaseCheck):
 
         # Let's say we consider it a failure if less than 10GB is free
         if free < self.MIN_SIZE_GB * (1024**3):  # 10 GB in bytes
-            self.error(f"Only {free / (1024 ** 3)} GB free space left!")
+            self.error(f"Only {free / (1024 ** 3):.2f} GB free space left!")
         else:
-            self.success(f"{free / (1024 ** 3)} GB free space available.")
+            self.success(f"{free / (1024 ** 3):.2f} GB free space available.")
