@@ -1,8 +1,11 @@
+from flask_cors import CORS
 from flask import Flask, jsonify, request
 
 from arb_sysload.utils import get_sysload_redis
 
 app = Flask(__name__)
+CORS(app)
+
 redis_client = get_sysload_redis()
 
 

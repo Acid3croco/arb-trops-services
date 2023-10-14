@@ -11,7 +11,7 @@ setup(
     long_description_content_type='text/markdown',
     version='0.0.1',
     packages=find_packages(),
-    install_requires=['arb_logger', 'flask'],
+    install_requires=['arb_logger', 'flask', ' Flask-CORS'],
     entry_points={
         'console_scripts': [
             'arb_sysload = arb_sysload.arb_sysload:main',
