@@ -4,12 +4,11 @@ from arb_sysload.base_check import BaseCheck
 
 
 class DockerCheck(BaseCheck):
-    INTERVAL = 60  # Run every 60 seconds
     EXPECTED_CONTAINERS = {
         "arb_trops_web", "crypto_dashboard_backend", "cryptools",
         "crypto_dashboard_redis", "crypto_dashboard_database", "arb_trops_db",
         "arb_trops_grafana"
-    }  # Example expected container names
+    }
 
     def run(self):
         client = docker.from_env()
