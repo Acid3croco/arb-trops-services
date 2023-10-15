@@ -22,9 +22,9 @@ class SystemUsageCheck(BaseCheck):
         ])
 
         # In this example, we'll assume that a CPU usage of over 90% or RAM usage over 90% is an error.
-        if cpu_percent > 90 or ram.percent > 90:
+        if cpu_percent > 90 or ram.percent > 95:
             self.error(message)
-        elif cpu_percent > 80 or ram.percent > 80:
+        elif cpu_percent > 80 or ram.percent > 90:
             self.warning(message)
         else:
             self.success(message)

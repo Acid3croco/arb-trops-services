@@ -9,9 +9,9 @@ setup(
     url="https://github.com/Acid3croco/arb-trops-services",
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
-    version='0.0.1',
+    version='0.1.0',
     packages=find_packages(),
-    install_requires=['arb_logger', 'flask', ' Flask-CORS'],
+    install_requires=['arb_logger', 'flask', ' Flask-CORS', 'docker'],
     entry_points={
         'console_scripts': [
             'arb_sysload = arb_sysload.arb_sysload:main',
