@@ -29,6 +29,7 @@ class BaseCheck(ABC):
         self.last_run = None
         self.status = None
         self.message = None
+        self.details = None
         self.user_status = None
 
         self.redis = get_sysload_redis()
@@ -63,24 +64,28 @@ class BaseCheck(ABC):
 
         return self.status
 
-    def success(self, message=None):
+    def success(self, message=None, detail=None):
         self.status = CheckStatus.OK
         self.message = message or "All good!"
+        self.details = detail
         self.logger.info(self.message)
 
-    def warning(self, message):
+    def warning(self, message, detail=None):
         self.status = CheckStatus.WARNING
         self.message = message
+        self.details = detail
         self.logger.warning(message)
 
-    def error(self, message):
+    def error(self, message, detail=None):
         self.status = CheckStatus.ERROR
         self.message = message
+        self.details = detail
         self.logger.error(message)
 
-    def failed(self, message):
+    def failed(self, message, detail=None):
         self.status = CheckStatus.FAILED
         self.message = message
+        self.details = detail
         self.logger.critical(message)
 
     def _save(self):
@@ -96,5 +101,5 @@ class BaseCheck(ABC):
             "status":
             self.status.name if self.status else CheckStatus.UNKNOWN.name,
             "message": self.message or '',
-            # "user_status": self.user_status.name if self.user_status else None
+            "details": self.details or '',
         }
