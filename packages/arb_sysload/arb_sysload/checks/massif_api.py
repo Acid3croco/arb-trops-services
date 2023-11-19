@@ -17,7 +17,7 @@ class MassifApiException(BaseCheck):
                     f"Found 'Exception' in log file: {self.LOG_FILE_PATH}")
             elif result.returncode == 1:  # grep did not find 'Exception'
                 self.success(
-                    f"No 'Exception' found in log file: {self.LOG_FILE_PATH}")
+                    f"No 'Exception' found")
             else:
                 # An error occurred in grep
                 self.error(f"Error checking log file: {result.stderr}")
