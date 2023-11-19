@@ -3,13 +3,12 @@ from setuptools import setup, find_packages
 setup(
     name='arb_sysload',
     author='arb',
+    version='0.2.0',
     author_email='arb.trops@gmail.com',
-    description=
-    "A package to monitor system load and send alerts to a redis server",
+    description="A package to monitor system load and send alerts to a redis server",
     url="https://github.com/Acid3croco/arb-trops-services",
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
-    version='0.1.0',
     packages=find_packages(),
     install_requires=['arb_logger', 'flask', ' Flask-CORS', 'docker'],
     entry_points={
