@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name='arb_sysload',
     author='arb',
-    version='0.2.0',
+    version='0.2.1',
     author_email='arb.trops@gmail.com',
     description="A package to monitor system load and send alerts to a redis server",
     url="https://github.com/Acid3croco/arb-trops-services",
