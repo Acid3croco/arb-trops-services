@@ -26,7 +26,7 @@ pip install arb_logger
 To install the `arb_logger` package from source, simply clone the repository and install it using `pip`:
 
 ```bash
-git clone https://github.com/yourusername/arb_logger.git
+git clone https://github.com/acid3croco/arb_logger.git
 cd arb_logger
 pip install .
 ```
