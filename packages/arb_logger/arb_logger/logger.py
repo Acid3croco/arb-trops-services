@@ -33,9 +33,16 @@ class RedisHandler(logging.Handler):
 
         self.alert_fields = {f.name for f in fields(AlertMessage)}
 
+        self.last_message = None
+
     def emit(self, record: logging.LogRecord):
         try:
             record_dict = AlertMessage.log_record_to_dict(record)
+            # Check if the message is the same as the last one
+            # to avoid spamming the redis channel
+            if hash(record_dict.msg) == self.last_message:
+                return
+            self.last_message = hash(record_dict.msg)
             #! split : to get the stream name being 'logs' for grafana
             self.redis_client.xadd(self.redis_key.split(':')[0], record_dict)
             self.redis_client.publish(self.redis_key,
