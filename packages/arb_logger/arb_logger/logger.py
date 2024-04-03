@@ -1,13 +1,16 @@
 import os
 import sys
 import json
+import time
 import inspect
 import logging
-import logging.handlers
 import traceback
+import logging.handlers
 
 from pathlib import Path
+from typing import Optional
 from dataclasses import fields
+from collections import defaultdict
 from arb_logger.alert_message import AlertMessage
 
 import coloredlogs
@@ -15,9 +18,21 @@ import coloredlogs
 from redis import Redis
 
 
-def get_redis_log_client() -> Redis:
+def get_redis_log_client() -> Optional[Redis]:
     # Will be replaced by another Redis client prolly
-    return Redis(host='localhost', port=6379, db=0, decode_responses=True)
+    try:
+        redis_client = Redis(host='localhost',
+                             port=6379,
+                             db=0,
+                             decode_responses=True)
+        success = redis_client.ping()
+    except Exception as e:
+        raise Exception('Could not connect to Redis') from e
+
+    if not success:
+        raise Exception('Could not ping Redis')
+
+    return redis_client
 
 
 def get_redis_log_key(name: str):
@@ -25,6 +40,7 @@ def get_redis_log_key(name: str):
 
 
 class RedisHandler(logging.Handler):
+    THROTTLE_TIME = 60
 
     def __init__(self, redis_client, redis_key):
         super().__init__()
@@ -33,16 +49,29 @@ class RedisHandler(logging.Handler):
 
         self.alert_fields = {f.name for f in fields(AlertMessage)}
 
-        self.last_message = None
+        self.last_message_ts = defaultdict(int)
+
+    def _throttle(self, record: logging.LogRecord):
+        # Throttle alerts
+        msg_hash = hash(record.msg)
+        curr_time = int(time.time())
+
+        throttle = False
+        if (prev_time := self.last_message_ts.get(
+                msg_hash, 0)) and curr_time - prev_time < self.THROTTLE_TIME:
+            throttle = True
+
+        self.last_message_ts[msg_hash] = curr_time
+        return throttle
 
     def emit(self, record: logging.LogRecord):
         try:
-            record_dict = AlertMessage.log_record_to_dict(record)
             # Check if the message is the same as the last one
             # to avoid spamming the redis channel
-            if hash(record_dict.msg) == self.last_message:
+            if self._throttle(record):
                 return
-            self.last_message = hash(record_dict.msg)
+
+            record_dict = AlertMessage.log_record_to_dict(record)
             #! split : to get the stream name being 'logs' for grafana
             self.redis_client.xadd(self.redis_key.split(':')[0], record_dict)
             self.redis_client.publish(self.redis_key,
@@ -62,7 +91,7 @@ def stdout(self, message, *args, **kwargs):
         self._log(STDOUT_LEVEL_NUM, message, args, **kwargs)
 
 
-logging.Logger.stdout = stdout
+logging.Logger.stdout = stdout  # type: ignore
 
 
 class LoggerStdout:
@@ -84,7 +113,8 @@ class LoggerStdout:
 
 def get_logger_name():
     # Get the name of the calling module
-    name = inspect.getmodule(inspect.currentframe().f_back).__name__
+    name = inspect.getmodule(
+        inspect.currentframe().f_back).__name__  # type: ignore
     if name in ('__main__', '__init__', None):
         raise ValueError(
             'Please provide an explicit name for the logger when called from __main__ or __init__.'
@@ -93,13 +123,14 @@ def get_logger_name():
     return name
 
 
-def get_logger(name,
-               level: int = logging.DEBUG,
-               path: Path = None,
-               log_in_file: bool = True,
-               short: bool = False,
-               redis_handler: bool = True,
-               custom_redis_client: Redis = None):
+def get_logger(
+        name,
+        level: int = logging.DEBUG,
+        path: Optional[Path] = None,
+        log_in_file: bool = True,
+        short: bool = False,
+        redis_handler: bool = True,  # type: ignore
+        custom_redis_client: Optional[Redis] = None):
 
     name = name or get_logger_name()
     logger = logging.getLogger(name)
@@ -122,7 +153,8 @@ def get_logger(name,
         if redis_handler:
             redis_client = custom_redis_client or get_redis_log_client()
             redis_key = get_redis_log_key(name)
-            redis_handler = RedisHandler(redis_client, redis_key)
+            redis_handler: logging.Handler = RedisHandler(
+                redis_client, redis_key)
             redis_handler.setLevel(logging.ERROR)
             redis_handler.setFormatter(formatter)
             logger.addHandler(redis_handler)
