@@ -129,7 +129,7 @@ def get_logger(
         path: Optional[Path] = None,
         log_in_file: bool = True,
         short: bool = False,
-        redis_handler: bool = True,  # type: ignore
+        redis_handler: bool = False,  # type: ignore
         custom_redis_client: Optional[Redis] = None):
 
     name = name or get_logger_name()
