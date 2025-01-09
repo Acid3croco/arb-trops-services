@@ -150,7 +150,8 @@ def get_logger(
                             milliseconds=True)
 
         # Set up RedisHandler
-        if redis_handler:
+        #! DISABLE FOR NOW
+        if redis_handler and False:
             redis_client = custom_redis_client or get_redis_log_client()
             redis_key = get_redis_log_key(name)
             redis_handler: logging.Handler = RedisHandler(
